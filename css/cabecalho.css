@@ -1,0 +1,25 @@
+/* ======================
+   Cabeçalho do caderno
+   Arquivo: css/cabecalho.css
+   ====================== */
+
+/* Ajustes específicos do cabeçalho que complementam o style.css */
+.cabecalho-caderno {
+  padding-left: 3.2cm;
+  padding-right: 2cm;
+  padding-top: 1rem;
+  padding-bottom: 0.8rem;
+}
+
+/* Garantir que campos do cabeçalho não quebrem o layout */
+.campo-cabecalho {
+  max-width: 100%;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 768px) {
+  .cabecalho-caderno {
+    padding-left: 2.8rem;
+    padding-right: 1.5rem;
+  }
+}

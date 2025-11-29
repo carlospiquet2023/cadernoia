@@ -3,7 +3,7 @@
 <!--
     ╔═══════════════════════════════════════════════════════════════════════╗
     ║                    CADERNO DIGITAL COM IA                             ║
-    ║                         Versão 1.0.0                                  ║
+    ║                         Versão 2.0.0                                  ║
     ╠═══════════════════════════════════════════════════════════════════════╣
     ║                                                                       ║
     ║  Desenvolvedor: Carlos Antonio de Oliveira Piquet                     ║
@@ -14,51 +14,64 @@
     ║  Copyright (c) 2025 Carlos Antonio de Oliveira Piquet                 ║
     ║  Licença: MIT (veja arquivo LICENSE para detalhes)                    ║
     ║                                                                       ║
-    ║  Tecnologias: HTML5, CSS3, JavaScript, Tailwind CSS                   ║
-    ║  APIs: Google Gemini, Web Speech, Web Audio, LocalStorage             ║
+    ║  Tecnologias: HTML5, CSS3, JavaScript ES6+, Tailwind CSS              ║
+    ║  APIs: Google Gemini/Groq, Web Speech, Web Audio, LocalStorage        ║
     ║                                                                       ║
     ║  Recursos: PWA, IA Generativa, Reconhecimento de Voz,                ║
     ║           Auto-save, Múltiplos Cadernos, Exportação PDF,              ║
-    ║           Compartilhamento WhatsApp, Design Premium                   ║
+    ║           Dark/Light Mode, Toasts, Atalhos de Teclado                 ║
     ║                                                                       ║
     ╚═══════════════════════════════════════════════════════════════════════╝
 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="description" content="Caderno Digital com IA - Anote, organize e continue seus textos com inteligência artificial">
+    <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1e1b4b" media="(prefers-color-scheme: dark)">
+    <meta name="description" content="Caderno Digital com IA - Anote, organize e continue seus textos com inteligência artificial. Design moderno com Dark Mode, exportação PDF e muito mais!">
+    <meta name="keywords" content="caderno digital, IA, inteligência artificial, notas, PDF, dark mode">
+    <meta name="author" content="Carlos Antonio de Oliveira Piquet">
+    
+    <!-- PWA -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://cdnjs.cloudflare.com; img-src 'self' data:; manifest-src 'self';">
+    <meta name="apple-mobile-web-app-title" content="Caderno IA">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <title>Caderno Digital com IA</title>
-    <!-- Carrega o Tailwind CSS para estilos rápidos -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Biblioteca para exportar PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Carrega fontes do Google que parecem escritas à mão -->
+    <!-- CSP - Flexível para Android/Capacitor -->
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'self' 'unsafe-inline' 'unsafe-eval'; style-src * 'self' 'unsafe-inline'; font-src * 'self' data:; connect-src * 'self'; img-src * 'self' data: blob:; media-src * 'self' blob:;">
+    
+    <title>Caderno Digital com IA 2.0</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Bibliotecas para exportar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&family=Dancing+Script:wght@500&family=Caveat&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&family=Dancing+Script:wght@500&family=Caveat&family=Inter:wght@400;500;600;700&family=Indie+Flower&family=Shadows+Into+Light&family=Gloria+Hallelujah&family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Montserrat:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- Estilos Premium -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cabecalho.css">
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 font-sans min-h-screen">
-
-    <!-- Botão Toggle Menu Lateral -->
-    <button class="toggle-sidebar no-print" id="toggle-sidebar" title="Abrir/Fechar Menu">
+<body>
+    <!-- Barra de Progresso da IA (inserida via JS) -->
+    
+    <!-- Menu Lateral (Oculto por padrão) -->
+    <button class="toggle-sidebar no-print" id="toggle-sidebar" title="Abrir/Fechar Menu" aria-label="Abrir menu lateral">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
     </button>
 
-    <!-- Menu Lateral -->
-    <aside class="sidebar no-print hidden" id="sidebar">
-        <!-- Cabeçalho do Menu -->
+    <aside class="sidebar no-print hidden" id="sidebar" role="navigation" aria-label="Menu lateral">
         <div class="sidebar-header">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
@@ -68,197 +81,373 @@
     </aside>
 
     <!-- Conteúdo Principal -->
-    <div class="main-content" id="main-content">
+    <main class="main-content" id="main-content">
         <div class="flex flex-col items-center justify-center p-4 md:p-8">
 
-    <!-- Barra de Ferramentas -->
-    <div class="w-full max-w-5xl mb-4 bg-white shadow-lg rounded-xl p-4">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <!-- Título -->
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-                </svg>
-                <h1 class="text-xl font-bold text-gray-800">Caderno IA</h1>
-            </div>
-            
-            <!-- Controles -->
-            <div class="flex flex-col md:flex-row items-center gap-4">
-                <!-- Meus Cadernos -->
-                <div class="flex flex-col items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600">Meus Cadernos</label>
-                    <select id="caderno-selector-toolbar" class="px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-sm" title="Selecionar caderno">
-                        <!-- Opções carregadas via JS -->
-                    </select>
+            <!-- Barra de Ferramentas Premium -->
+            <div class="w-full max-w-5xl mb-4 toolbar no-print">
+                <!-- Header da Toolbar -->
+                <div class="toolbar-header">
+                    <div class="toolbar-brand">
+                        <svg class="toolbar-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                        </svg>
+                        <h1 class="toolbar-title">Caderno Digital com IA</h1>
+                    </div>
+                    <!-- Stats e Theme Toggle são inseridos via JS -->
                 </div>
                 
-                <!-- Botões -->
-                <div class="flex flex-col gap-2">
-                    <button id="novo-caderno-btn-toolbar" class="px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white text-xs rounded-lg transition-colors flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                        </svg>
-                        Novo Caderno
-                    </button>
+                <!-- Controles -->
+                <div class="toolbar-controls">
+                    <!-- Meus Cadernos -->
+                    <div class="toolbar-group">
+                        <label class="toolbar-label" for="caderno-selector-toolbar">Meus Cadernos</label>
+                        <select id="caderno-selector-toolbar" class="input select" title="Selecionar caderno">
+                            <!-- Opções carregadas via JS -->
+                        </select>
+                    </div>
                     
-                    <button id="renomear-caderno-btn-toolbar" class="px-2 py-1 bg-yellow-500 hover:bg-yellow-600 text-white text-xs rounded-lg transition-colors flex items-center gap-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                        Renomear Caderno
-                    </button>
+                    <!-- Botões de Caderno -->
+                    <div class="toolbar-group">
+                        <label class="toolbar-label">Ações</label>
+                        <div class="toolbar-buttons">
+                            <button id="novo-caderno-btn-toolbar" class="btn btn-primary" title="Criar novo caderno (Ctrl+N)">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                </svg>
+                                <span class="hidden sm:inline">Novo</span>
+                            </button>
+                            
+                            <button id="renomear-caderno-btn-toolbar" class="btn btn-warning" title="Renomear caderno atual">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                <span class="hidden sm:inline">Renomear</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Estilo da Fonte -->
+                    <div class="toolbar-group">
+                        <label class="toolbar-label" for="font-selector-toolbar">Fonte</label>
+                        <select id="font-selector-toolbar" class="input select font-select" title="Selecionar fonte">
+                            <optgroup label="✍️ Manuscritas">
+                                <option value="font-kalam" class="font-kalam">Kalam</option>
+                                <option value="font-patrick" class="font-patrick">Patrick Hand</option>
+                                <option value="font-dancing" class="font-dancing">Dancing Script</option>
+                                <option value="font-caveat" class="font-caveat">Caveat</option>
+                                <option value="font-indie" class="font-indie">Indie Flower</option>
+                                <option value="font-shadows" class="font-shadows">Shadows Into Light</option>
+                                <option value="font-gloria" class="font-gloria">Gloria Hallelujah</option>
+                            </optgroup>
+                            <optgroup label="📄 Clássicas">
+                                <option value="font-arial" class="font-arial">Arial</option>
+                                <option value="font-times" class="font-times">Times New Roman</option>
+                                <option value="font-georgia" class="font-georgia">Georgia</option>
+                                <option value="font-verdana" class="font-verdana">Verdana</option>
+                                <option value="font-tahoma" class="font-tahoma">Tahoma</option>
+                                <option value="font-trebuchet" class="font-trebuchet">Trebuchet MS</option>
+                            </optgroup>
+                            <optgroup label="💻 Modernas">
+                                <option value="font-roboto" class="font-roboto">Roboto</option>
+                                <option value="font-opensans" class="font-opensans">Open Sans</option>
+                                <option value="font-montserrat" class="font-montserrat">Montserrat</option>
+                                <option value="font-poppins" class="font-poppins">Poppins</option>
+                                <option value="font-lato" class="font-lato">Lato</option>
+                            </optgroup>
+                            <optgroup label="🖥️ Monospace">
+                                <option value="font-courier" class="font-courier">Courier New</option>
+                                <option value="font-consolas" class="font-consolas">Consolas</option>
+                                <option value="font-monaco" class="font-monaco">Monaco</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    
+                    <!-- Cor da Caneta -->
+                    <div class="toolbar-group">
+                        <label class="toolbar-label" for="color-selector-toolbar">Caneta</label>
+                        <select id="color-selector-toolbar" class="input select" title="Cor da caneta">
+                            <option value="black">⚫ Preto</option>
+                            <option value="blue">🔵 Azul</option>
+                            <option value="#dc2626">🔴 Vermelho</option>
+                            <option value="#16a34a">🟢 Verde</option>
+                            <option value="#7c3aed">🟣 Roxo</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Marcadores de Texto -->
+                    <div class="toolbar-group">
+                        <label class="toolbar-label">Marcadores</label>
+                        <div class="highlight-buttons">
+                            <button id="highlight-yellow" class="highlight-btn yellow" title="Destacar em amarelo (selecione o texto primeiro)" aria-label="Destacar em amarelo"></button>
+                            <button id="highlight-blue" class="highlight-btn blue" title="Destacar em azul" aria-label="Destacar em azul"></button>
+                            <button id="highlight-green" class="highlight-btn green" title="Destacar em verde" aria-label="Destacar em verde"></button>
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Estilo da Fonte -->
-                <div class="flex flex-col items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600">Estilo da Fonte</label>
-                    <select id="font-selector-toolbar" class="px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-sm" title="Selecionar fonte">
-                        <option value="font-kalam" class="font-kalam">Kalam</option>
-                        <option value="font-patrick" class="font-patrick">Patrick Hand</option>
-                        <option value="font-dancing" class="font-dancing">Dancing Script</option>
-                        <option value="font-caveat" class="font-caveat">Caveat</option>
-                        <option value="font-arial" class="font-arial">Arial</option>
-                        <option value="font-times" class="font-times">Times New Roman</option>
-                    </select>
-                </div>
-                
-                <!-- Cor da Caneta -->
-                <div class="flex flex-col items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600">Cor da Caneta</label>
-                    <select id="color-selector-toolbar" class="px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none text-sm" title="Selecionar cor da caneta">
-                        <option value="black">Preto</option>
-                        <option value="blue">Azul</option>
-                    </select>
-                </div>
-                
-                <!-- Marcadores de Texto -->
-                <div class="flex flex-col items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600">Marcadores</label>
-                    <div class="flex gap-1">
-                        <button id="highlight-yellow" class="w-8 h-8 bg-yellow-300 hover:bg-yellow-400 rounded border-2 border-gray-300" title="Destacar em amarelo"></button>
-                        <button id="highlight-blue" class="w-8 h-8 bg-blue-300 hover:bg-blue-400 rounded border-2 border-gray-300" title="Destacar em azul"></button>
-                        <button id="highlight-green" class="w-8 h-8 bg-green-300 hover:bg-green-400 rounded border-2 border-gray-300" title="Destacar em verde"></button>
+                <!-- Barra de Formatação Estilo Word -->
+                <div class="format-toolbar">
+                    <!-- Formatação de Texto -->
+                    <div class="format-group">
+                        <button id="format-bold" class="format-btn" title="Negrito (Ctrl+B)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+                        </button>
+                        <button id="format-italic" class="format-btn" title="Itálico (Ctrl+I)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
+                        </button>
+                        <button id="format-underline" class="format-btn" title="Sublinhado (Ctrl+U)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
+                        </button>
+                        <button id="format-strike" class="format-btn" title="Tachado">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="format-divider"></div>
+                    
+                    <!-- Tamanho da Fonte -->
+                    <div class="format-group">
+                        <button id="format-size-down" class="format-btn" title="Diminuir fonte">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>
+                        </button>
+                        <select id="format-font-size" class="format-select" title="Tamanho da fonte">
+                            <option value="12px">12</option>
+                            <option value="14px">14</option>
+                            <option value="16px" selected>16</option>
+                            <option value="18px">18</option>
+                            <option value="20px">20</option>
+                            <option value="24px">24</option>
+                            <option value="28px">28</option>
+                            <option value="32px">32</option>
+                            <option value="36px">36</option>
+                        </select>
+                        <button id="format-size-up" class="format-btn" title="Aumentar fonte">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="format-divider"></div>
+                    
+                    <!-- Alinhamento -->
+                    <div class="format-group">
+                        <button id="format-align-left" class="format-btn active" title="Alinhar à esquerda">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
+                        </button>
+                        <button id="format-align-center" class="format-btn" title="Centralizar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
+                        </button>
+                        <button id="format-align-right" class="format-btn" title="Alinhar à direita">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
+                        </button>
+                        <button id="format-align-justify" class="format-btn" title="Justificar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="format-divider"></div>
+                    
+                    <!-- Listas -->
+                    <div class="format-group">
+                        <button id="format-list-bullet" class="format-btn" title="Lista com marcadores">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+                        </button>
+                        <button id="format-list-number" class="format-btn" title="Lista numerada">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+                        </button>
+                        <button id="format-indent-decrease" class="format-btn" title="Diminuir recuo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11 17h10v-2H11v2zm-8-5l4 4V8l-4 4zm0 9h18v-2H3v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
+                        </button>
+                        <button id="format-indent-increase" class="format-btn" title="Aumentar recuo">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zM3 8v8l4-4-4-4zm8 9h10v-2H11v2zM3 3v2h18V3H3zm8 6h10V7H11v2zm0 4h10v-2H11v2z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="format-divider"></div>
+                    
+                    <!-- Inserir -->
+                    <div class="format-group">
+                        <button id="format-insert-table" class="format-btn" title="Inserir tabela">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg>
+                        </button>
+                        <button id="format-insert-hr" class="format-btn" title="Inserir linha horizontal">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 11h16v2H4z"/></svg>
+                        </button>
+                        <button id="format-insert-link" class="format-btn" title="Inserir link">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                        </button>
+                        <button id="format-clear" class="format-btn" title="Limpar formatação">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.27 5L2 6.27l6.97 6.97L6.5 19h3l1.57-3.66L16.73 21 18 19.73 3.55 5.27 3.27 5zM6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V5H6z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="format-divider"></div>
+                    
+                    <!-- Desfazer/Refazer -->
+                    <div class="format-group">
+                        <button id="format-undo" class="format-btn" title="Desfazer (Ctrl+Z)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                        </button>
+                        <button id="format-redo" class="format-btn" title="Refazer (Ctrl+Y)">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="format-divider"></div>
+                    
+                    <!-- Privacidade/Cadeado -->
+                    <div class="format-group privacy-group">
+                        <button id="privacy-lock-btn" class="format-btn privacy-btn privacy-lock" title="Clique para bloquear o conteúdo">
+                            <svg id="lock-icon-open" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+                            <svg id="lock-icon-closed" class="lock-icon-hidden" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        </button>
+                        <button id="privacy-settings-btn" class="format-btn privacy-btn privacy-key" title="Configurar ou alterar senha de proteção">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- O "Caderno" -->
-    <div class="w-full max-w-5xl bg-white shadow-2xl rounded-2xl overflow-hidden book-container">
-        <!-- Cabeçalho da Folha -->
-        <div class="cabecalho-caderno">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-                <div class="flex flex-col">
-                    <label class="text-xs md:text-sm font-medium text-gray-600 mb-1">Data:</label>
-                    <input type="date" 
-                           id="campo-data" 
-                           class="campo-cabecalho font-kalam"
-                           aria-label="Data da aula">
+            <!-- Container do Caderno -->
+            <div class="w-full max-w-5xl book-container">
+                <!-- Cabeçalho da Folha -->
+                <div class="cabecalho-caderno">
+                    <div class="cabecalho-grid">
+                        <div class="flex flex-col">
+                            <label class="toolbar-label" for="campo-data">Data</label>
+                            <input type="date" 
+                                   id="campo-data" 
+                                   class="campo-cabecalho font-kalam"
+                                   aria-label="Data da aula">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="toolbar-label" for="campo-materia">Matéria</label>
+                            <input type="text" 
+                                   id="campo-materia" 
+                                   class="campo-cabecalho font-kalam" 
+                                   placeholder="Ex: Matemática"
+                                   maxlength="50"
+                                   aria-label="Nome da matéria">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="toolbar-label" for="campo-professor">Professor</label>
+                            <input type="text" 
+                                   id="campo-professor" 
+                                   class="campo-cabecalho font-kalam" 
+                                   placeholder="Ex: Prof. Silva"
+                                   maxlength="30"
+                                   aria-label="Nome do professor">
+                        </div>
+                        <div class="flex flex-col">
+                            <label class="toolbar-label" for="campo-turno">Turno</label>
+                            <select id="campo-turno" 
+                                    class="campo-cabecalho font-kalam"
+                                    aria-label="Turno da aula">
+                                <option value="">Selecione...</option>
+                                <option value="matutino">☀️ Matutino</option>
+                                <option value="vespertino">🌤️ Vespertino</option>
+                                <option value="noturno">🌙 Noturno</option>
+                                <option value="integral">📚 Integral</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-xs md:text-sm font-medium text-gray-600 mb-1">Matéria:</label>
-                    <input type="text" 
-                           id="campo-materia" 
-                           class="campo-cabecalho font-kalam" 
-                           placeholder="Ex: Matemática"
-                           maxlength="100"
-                           aria-label="Nome da matéria">
+                <!-- Separador de Folha -->
+                <div class="cabecalho-separator"></div>
+                
+                <!-- Área de Escrita -->
+                <div id="pagina-caderno" 
+                     contenteditable="true" 
+                     spellcheck="true"
+                     class="font-kalam page" 
+                     role="textbox" 
+                     aria-multiline="true"
+                     aria-label="Área de escrita do caderno"
+                     title="Comece a digitar aqui...">
                 </div>
-                <div class="flex flex-col">
-                    <label class="text-xs md:text-sm font-medium text-gray-600 mb-1">Professor:</label>
-                    <input type="text" 
-                           id="campo-professor" 
-                           class="campo-cabecalho font-kalam" 
-                           placeholder="Ex: Prof. Silva"
-                           maxlength="19"
-                           aria-label="Nome do professor">
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs md:text-sm font-medium text-gray-600 mb-1">Turno:</label>
-                    <select id="campo-turno" 
-                            class="campo-cabecalho font-kalam"
-                            aria-label="Turno da aula">
-                        <option value="">Selecione</option>
-                        <option value="matutino">Matutino</option>
-                        <option value="vespertino">Vespertino</option>
-                        <option value="noturno">Noturno</option>
-                        <option value="integral">Integral</option>
-                    </select>
-                </div>
+                
+                <!-- Navegação de Páginas -->
+                <nav class="page-navigation no-print" aria-label="Navegação de páginas">
+                    <button id="pagina-anterior" 
+                            class="btn btn-primary"
+                            title="Página Anterior (PageUp)"
+                            aria-label="Ir para página anterior">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="hidden sm:inline">Anterior</span>
+                    </button>
+                    
+                    <span id="pagina-info" class="page-info">Página 1 de 20</span>
+                    
+                    <button id="pagina-proxima" 
+                            class="btn btn-primary"
+                            title="Próxima Página (PageDown)"
+                            aria-label="Ir para próxima página">
+                        <span class="hidden sm:inline">Próxima</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </nav>
             </div>
+            
+            <!-- Rodapé removido -->
         </div>
-        
-        <div id="pagina-caderno" 
-             contenteditable="true" 
-             spellcheck="true"
-             class="font-kalam page" 
-             role="textbox" 
-             aria-multiline="true"
-             title="Área de escrita do caderno">
-            <!-- Comece a digitar aqui... -->
-            Olá! Este é o seu caderno digital.<br>
-            Você pode começar a digitar aqui. Tente escrever algo errado para ver o corretor ortográfico em ação.<br>
-            Use o menu acima para mudar o estilo da sua "caneta"!<br><br>
-            Escreva um texto longo aqui e depois clique no botão "Continuar com IA" para ver a IA continuar seu texto.
-        </div>
-        
-        <!-- Navegação de Páginas -->
-        <div class="flex justify-center items-center gap-4 py-4 bg-gray-50 border-t border-gray-200 no-print">
-            <button id="pagina-anterior" 
-                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Página Anterior">
-                ← Anterior
-            </button>
-            <span id="pagina-info" class="font-semibold text-gray-700">Página 1</span>
-            <button id="pagina-proxima" 
-                    class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Próxima Página">
-                Próxima →
-            </button>
-        </div>
-    </div>
+    </main>
     
-    <!-- Rodapé com Créditos -->
-    <footer class="text-center text-white text-sm no-print">
-        <p class="mb-1">💻 Desenvolvido por <strong>Carlos Antonio de Oliveira Piquet</strong></p>
-        <p class="text-xs">Especialista em Inteligência Artificial e Redes de Computadores</p>
-        <p class="text-xs mt-1">📧 carlospiquet.projetos@gmail.com | © 2025 Todos os direitos reservados</p>
-    </footer>
-    
-    <!-- Botões Flutuantes de Ação -->
-    <div class="fixed bottom-8 right-8 flex flex-col gap-3 z-50 no-print">
+    <!-- Botões Flutuantes de Ação (FABs) -->
+    <div class="fab-container no-print">
+        <!-- Ditado por Voz -->
         <button id="voz-btn" 
-                class="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
+                class="fab fab-voice"
                 title="Ditado por Voz"
-                aria-label="Ditado por Voz">
+                aria-label="Ativar ditado por voz">
+            <span class="fab-tooltip">Ditado por Voz</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clip-rule="evenodd" />
             </svg>
         </button>
         
+        <!-- Continuar com IA -->
         <button id="analisar-ia-btn" 
-                class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
-                title="Continuar texto com IA"
-                aria-label="Continuar texto com IA">
+                class="fab fab-ia"
+                title="Continuar texto com IA (Ctrl+I)"
+                aria-label="Continuar texto com inteligência artificial">
+            <span class="fab-tooltip">Continuar com IA</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.91.5.5 0 00.454.09A5 5 0 0010 11z" clip-rule="evenodd" />
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+            </svg>
+        </button>
+
+        <!-- Configurar IA (chave API) -->
+        <button id="config-ia-btn" 
+                class="fab fab-config"
+                title="Configurar chave da IA"
+                aria-label="Configurar chave da inteligência artificial">
+            <span class="fab-tooltip">⚙️ Configurar IA</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
             </svg>
         </button>
         
+        <!-- Exportar PDF -->
         <button id="exportar-pdf-btn" 
-                class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
-                title="Exportar para PDF"
-                aria-label="Exportar para PDF">
+                class="fab fab-pdf"
+                title="Exportar para PDF (Ctrl+P)"
+                aria-label="Exportar página para PDF">
+            <span class="fab-tooltip">Exportar PDF</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
             </svg>
         </button>
         
+        <!-- WhatsApp -->
         <button id="whatsapp-btn" 
-                class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95"
+                class="fab fab-whatsapp"
                 title="Enviar para WhatsApp"
-                aria-label="Enviar para WhatsApp">
+                aria-label="Compartilhar no WhatsApp">
+            <span class="fab-tooltip">WhatsApp</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
             </svg>
@@ -266,63 +455,211 @@
     </div>
     
     <!-- Modal WhatsApp -->
-    <div id="modal-whatsapp" class="modal-overlay no-print">
+    <div id="modal-whatsapp" class="modal-overlay no-print" role="dialog" aria-modal="true" aria-labelledby="modal-whatsapp-title">
         <div class="modal-content">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" viewBox="0 0 24 24" fill="currentColor">
+            <div class="modal-header">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 whatsapp-icon-color" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
                 </svg>
-                Enviar para WhatsApp
-            </h2>
+                <h2 id="modal-whatsapp-title" class="modal-title">Enviar para WhatsApp</h2>
+            </div>
             
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Resumo (máx. 500 caracteres)</label>
-                <textarea id="whatsapp-resumo" 
-                          class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none resize-none"
-                          rows="4"
-                          maxlength="500"
-                          placeholder="Digite um resumo do conteúdo..."></textarea>
-                <div class="text-right text-sm text-gray-500 mt-1">
-                    <span id="char-count">0</span>/500
+            <div class="modal-body">
+                <div class="mb-4">
+                    <label class="toolbar-label" for="whatsapp-resumo">Resumo (máx. 500 caracteres)</label>
+                    <textarea id="whatsapp-resumo" 
+                              class="input w-full mt-1 resize-none"
+                              rows="4"
+                              maxlength="500"
+                              placeholder="Digite um resumo do conteúdo..."></textarea>
+                    <div class="text-right text-xs mt-1 text-tertiary">
+                        <span id="char-count">0</span>/500
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="toolbar-label">Número do WhatsApp</label>
+                    <div class="flex gap-2 mt-1">
+                        <input type="text" 
+                               value="+55" 
+                               disabled
+                               class="input w-16 text-center font-semibold bg-tertiary"
+                               title="Código do país">
+                        <input type="text" 
+                               id="whatsapp-ddd" 
+                               class="input w-20 text-center" 
+                               placeholder="DDD" 
+                               maxlength="2" 
+                               pattern="[0-9]*"
+                               inputmode="numeric"
+                               aria-label="DDD">
+                        <input type="text" 
+                               id="whatsapp-numero" 
+                               class="input flex-1"
+                               placeholder="Número (9 dígitos)"
+                               maxlength="9"
+                               pattern="[0-9]*"
+                               inputmode="numeric"
+                               aria-label="Número de telefone">
+                    </div>
                 </div>
             </div>
             
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Número do WhatsApp</label>
-                <div class="flex gap-2">
-                    <input type="text" 
-                           value="+55" 
-                           disabled
-                           class="w-16 p-3 bg-gray-100 border-2 border-gray-300 rounded-lg text-center font-semibold"
-                           title="Código do país">
-                    <label for="whatsapp-ddd" class="sr-only">DDD</label>
-                    <input type="text" id="whatsapp-ddd" class="w-20 p-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none text-center" placeholder="DDD" maxlength="2" pattern="[0-9]*" title="DDD" aria-label="DDD">
-                    <label for="whatsapp-numero" class="sr-only">Número</label>
-                    <input type="text" 
-                           id="whatsapp-numero" 
-                           class="flex-1 p-3 border-2 border-gray-300 rounded-lg focus:border-green-500 focus:outline-none"
-                           placeholder="Número (9 dígitos)"
-                           maxlength="9"
-                           pattern="[0-9]*">
-                </div>
-            </div>
-            
-            <div class="flex gap-3">
-                <button id="whatsapp-cancelar" 
-                        class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all">
+            <div class="modal-footer">
+                <button id="whatsapp-cancelar" class="btn btn-secondary">
                     Cancelar
                 </button>
-                <button id="whatsapp-enviar" 
-                        class="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-all shadow-lg">
+                <button id="whatsapp-enviar" class="btn btn-success">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
                     Enviar
                 </button>
             </div>
         </div>
     </div>
-    
-    </div> <!-- Fecha main-content -->
+
+    <!-- Modal Inserir Tabela -->
+    <div id="modal-table" class="modal-table-overlay no-print" role="dialog" aria-modal="true">
+        <div class="modal-table-content">
+            <h3 class="modal-table-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg>
+                Inserir Tabela
+            </h3>
+            <div id="table-grid" class="modal-table-grid"></div>
+            <p id="table-size-info" class="table-size-info">Selecione o tamanho</p>
+            <div class="modal-table-inputs">
+                <div class="input-group">
+                    <label for="table-rows">Linhas</label>
+                    <input type="number" id="table-rows" min="1" max="20" value="3">
+                </div>
+                <div class="input-group">
+                    <label for="table-cols">Colunas</label>
+                    <input type="number" id="table-cols" min="1" max="10" value="3">
+                </div>
+            </div>
+            <div class="modal-table-actions">
+                <button id="table-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="table-insert" class="btn btn-primary">Inserir</button>
+            </div>
+        </div>
     </div>
 
-    <script type="module" src="js/app.js"></script>
+    <!-- Modal Inserir Link -->
+    <div id="modal-link" class="modal-table-overlay no-print" role="dialog" aria-modal="true">
+        <div class="modal-table-content">
+            <h3 class="modal-table-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                Inserir Link
+            </h3>
+            <div class="modal-table-inputs modal-table-inputs-vertical">
+                <div class="input-group">
+                    <label for="link-text">Texto do link</label>
+                    <input type="text" id="link-text" placeholder="Digite o texto...">
+                </div>
+                <div class="input-group">
+                    <label for="link-url">URL</label>
+                    <input type="url" id="link-url" placeholder="https://...">
+                </div>
+            </div>
+            <div class="modal-table-actions">
+                <button id="link-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="link-insert" class="btn btn-primary">Inserir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Configurar Senha -->
+    <div id="modal-privacy-setup" class="modal-table-overlay no-print" role="dialog" aria-modal="true">
+        <div class="modal-table-content privacy-modal">
+            <h3 class="modal-table-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                🔐 Configurar Proteção
+            </h3>
+            <div class="modal-table-inputs modal-table-inputs-vertical">
+                <div class="input-group">
+                    <label for="privacy-password">🔑 Senha</label>
+                    <input type="password" id="privacy-password" placeholder="Digite sua senha..." minlength="4">
+                </div>
+                <div class="input-group">
+                    <label for="privacy-password-confirm">🔑 Confirmar Senha</label>
+                    <input type="password" id="privacy-password-confirm" placeholder="Confirme sua senha..." minlength="4">
+                </div>
+                <div class="input-group">
+                    <label for="privacy-hint">💡 Palavra-chave de recuperação</label>
+                    <input type="text" id="privacy-hint" placeholder="Ex: nome do seu pet, cidade natal...">
+                    <small class="text-tertiary">Use para recuperar a senha se esquecer</small>
+                </div>
+            </div>
+            <div class="modal-table-actions">
+                <button id="privacy-setup-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="privacy-setup-save" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Desbloquear -->
+    <div id="modal-privacy-unlock" class="modal-table-overlay no-print" role="dialog" aria-modal="true">
+        <div class="modal-table-content privacy-modal">
+            <h3 class="modal-table-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+                🔓 Desbloquear Caderno
+            </h3>
+            <div class="modal-table-inputs modal-table-inputs-vertical">
+                <div class="input-group">
+                    <label for="unlock-password">🔑 Digite sua senha</label>
+                    <input type="password" id="unlock-password" placeholder="Sua senha...">
+                </div>
+            </div>
+            <div class="modal-table-actions">
+                <button id="unlock-forgot" class="btn btn-warning">Esqueci a senha</button>
+                <button id="unlock-submit" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>
+                    Desbloquear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Recuperar Senha -->
+    <div id="modal-privacy-recover" class="modal-table-overlay no-print" role="dialog" aria-modal="true">
+        <div class="modal-table-content privacy-modal">
+            <h3 class="modal-table-title">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+                🔑 Recuperar Senha
+            </h3>
+            <div class="modal-table-inputs modal-table-inputs-vertical">
+                <div class="input-group">
+                    <label for="recover-hint">💡 Digite sua palavra-chave</label>
+                    <input type="text" id="recover-hint" placeholder="Sua palavra-chave de recuperação...">
+                </div>
+                <div class="input-group hidden-field" id="new-password-group">
+                    <label for="recover-new-password">🔑 Nova Senha</label>
+                    <input type="password" id="recover-new-password" placeholder="Digite a nova senha..." minlength="4">
+                </div>
+                <div class="input-group hidden-field" id="confirm-password-group">
+                    <label for="recover-confirm-password">🔑 Confirmar Nova Senha</label>
+                    <input type="password" id="recover-confirm-password" placeholder="Confirme a nova senha..." minlength="4">
+                </div>
+            </div>
+            <div class="modal-table-actions">
+                <button id="recover-cancel" class="btn btn-secondary">Cancelar</button>
+                <button id="recover-verify" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Verificar
+                </button>
+                <button id="recover-save" class="btn btn-success hidden-field">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Salvar Nova Senha
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/app.js"></script>
 </body>
 </html>
